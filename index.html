@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spin a Dreidel</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body, .app-wrapper {
+      height: 100%;
+      width: 100%;
+    }
+
+    .app-wrapper {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow: auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffffff;
+      padding: 48px 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .main-title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+
+    .image-carousel {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 48px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .carousel-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
+      margin-bottom: 24px;
+    }
+
+    .image-icon img {
+      max-width: 100%;
+      max-height: 300px;
+      transition: transform 0.3s ease;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    .carousel-controls {
+      text-align: center;
+    }
+
+    .start-button {
+      background: #f093fb;
+      color: #ffffff;
+      border: none;
+      padding: 16px 48px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .start-button:hover {
+      background: #f5576c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+    }
+
+    .start-button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .status-text {
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 500;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="app-wrapper">
+   <div class="container">
+    <div class="header">
+      <h1 id="mainTitle" class="main-title">Spin a Dreidel</h1>
+      <p id="subtitle" class="subtitle">Have fun watching the images spin</p>
+    </div>
+
+    <div class="image-carousel">
+     <div class="carousel-display">
+      <div class="image-icon" id="imageDisplay">
+       <!-- fixed image element (use correct src attribute) -->
+       <img id="carouselImg" src="Untitled design (41).png" alt="carousel image">
+      </div>
+     </div>
+     <div class="carousel-controls">
+       <button class="start-button" id="startButton">Start Random Images</button>
+       <p class="status-text" id="statusText">Click to start the image carousel</p>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <script>
+    // default config keys now include main_title and subtitle to match onConfigChange
+    const defaultConfig = {
+      main_title: "Spin a Dreidel",
+      subtitle: "Have fun watching the images spin",
+      button_text: "Start Random Images"
+    };
+
+    // images as an array of string paths (not HTML tags)
+    const images = [
+      "Untitled design (41).png",
+      "Untitled design (42).png",
+      "Untitled design (43).png",
+      "Untitled design (44).png"
+    ];
+
+    let intervalId = null;
+    let isRunning = false;
+    let currentIndex = 0;
+
+    const imageDisplay = document.getElementById('imageDisplay');
+    const imageElement = document.getElementById('carouselImg');
+    const startButton = document.getElementById('startButton');
+    const statusText = document.getElementById('statusText');
+
+    function getNextImage() {
+      const img = images[currentIndex];
+      currentIndex = (currentIndex + 1) % images.length;
+      return img;
+    }
+
+    function startCarousel() {
+      if (isRunning) return;
+      
+      isRunning = true;
+      startButton.disabled = true;
+      statusText.textContent = 'Starting slow...';
+      
+      let speed = 400; // Start slow
+      let accelerating = true;
+      let cycleCount = 0;
+      const maxCycles = 20 + Math.floor(Math.random() * 10); // Random stop point
+      
+      function cycle() {
+        if (cycleCount >= maxCycles) {
+          // show the last displayed image (currentIndex has already advanced, so take previous)
+          const lastIndex = (currentIndex - 1 + images.length) % images.length;
+          const finalImage = images[lastIndex];
+          imageElement.src = finalImage;
+          statusText.textContent = `Stopped on ${finalImage}! Click to play again.`;
+          isRunning = false;
+          startButton.disabled = false;
+          return;
+        }
+        
+        const next = getNextImage();
+        imageElement.src = next;
+        imageElement.style.transform = 'scale(1.08)';
+        setTimeout(() => {
+          imageElement.style.transform = 'scale(1)';
+        }, 150);
+        
+        cycleCount++;
+        
+        // Speed up phase (first half)
+        if (accelerating && cycleCount < maxCycles / 2) {
+          speed = Math.max(50, speed - 30); // Speed up
+          if (cycleCount === Math.floor(maxCycles / 4)) {
+            statusText.textContent = 'Speeding up...';
+          }
+        } 
+        // Slow down phase (second half)
+        else {
+          if (accelerating) {
+            accelerating = false;
+            statusText.textContent = 'Slowing down...';
+          }
+          speed = Math.min(500, speed + 40); // Slow down
+        }
+        
+        setTimeout(cycle, speed);
+      }
+      
+      cycle();
+    }
+
+    startButton.addEventListener('click', startCarousel);
+
+    // Config integration for elementSdk (if present)
+    async function onConfigChange(config) {
+      document.getElementById('mainTitle').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('startButton').textContent = config.button_text || defaultConfig.button_text;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["main_title", config.main_title || defaultConfig.main_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["button_text", config.button_text || defaultConfig.button_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ </body>
+</html>
