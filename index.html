@@ -121,19 +121,19 @@
    <div class="container">
     <div class="header">
       <h1 id="mainTitle" class="main-title">Spin a Dreidel</h1>
-      <p id="subtitle" class="subtitle">Have fun watching the images spin</p>
+      <p id="subtitle" class="subtitle">Have fun watching the Dreidel spin</p>
     </div>
 
     <div class="image-carousel">
      <div class="carousel-display">
       <div class="image-icon" id="imageDisplay">
        <!-- fixed image element (use correct src attribute) -->
-       <img id="carouselImg" src="Untitled design (41).png" alt="carousel image">
+       <img id="carouselImg" src="nun" alt="carousel image">
       </div>
      </div>
      <div class="carousel-controls">
-       <button class="start-button" id="startButton">Start Random Images</button>
-       <p class="status-text" id="statusText">Click to start the image carousel</p>
+       <button class="start-button" id="startButton">Spin The Dreidel</button>
+       <p class="status-text" id="statusText">Click to make the Dreidel spin</p>
      </div>
     </div>
    </div>
@@ -143,16 +143,16 @@
     // default config keys now include main_title and subtitle to match onConfigChange
     const defaultConfig = {
       main_title: "Spin a Dreidel",
-      subtitle: "Have fun watching the images spin",
-      button_text: "Start Random Images"
+      subtitle: "Have fun watching the Dreidel spin",
+      button_text: "Spin The Dreidel"
     };
 
     // images as an array of string paths (not HTML tags)
     const images = [
-      "Untitled design (41).png",
-      "Untitled design (42).png",
-      "Untitled design (43).png",
-      "Untitled design (44).png"
+      "nun",
+      "gimel",
+      "hey",
+      "shin"
     ];
 
     let intervalId = null;
